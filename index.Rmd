@@ -1,6 +1,6 @@
 --- 
-title: "A Minimal Book Example"
-author: "Yihui Xie"
+title: "Applied Nonparametric Econometrics Notes"
+author: "A. John Woodill"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
@@ -8,27 +8,147 @@ documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
-github-repo: rstudio/bookdown-demo
-description: "This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook."
+github-repo: johnwoodill/applied-nonparametric-econometrics-notes
+description: "Notes for Applied Nonparametric Econometrics (Parmeter and Henderson 2015)"
 ---
 
-# Prerequisites
+# Overview
 
-This is a _sample_ book written in **Markdown**. You can use anything that Pandoc's Markdown supports, e.g., a math equation $a^2 + b^2 = c^2$.
+This bookdown provides notes for "Applied Nonparametric Econometrics Notes" by Parmeter and Henderson 2015.  These notes follow the syllabus [AGEC 690: Applied Nonparametric Econometrics](https://ag.purdue.edu/agecon/Documents/690-3.pdf).
 
-For now, you have to install the development versions of **bookdown** from Github:
+Course Outline and Reading List:
 
-```{r eval=FALSE}
-devtools::install_github("rstudio/bookdown")
-```
+**1. Introduction: Parametric vs Nonparametric**
 
-Remember each Rmd file contains one and only one chapter, and a chapter is defined by the first-level heading `#`.
+* Henderson and Parmeter, Chapter 1
 
-To compile this example to PDF, you need to install XeLaTeX.
+* Li and Racine, Preface and start of Chapter 1
 
-```{r include=FALSE}
-# automatically create a bib database for R packages
-knitr::write_bib(c(
-  .packages(), 'bookdown', 'knitr', 'rmarkdown'
-), 'packages.bib')
-```
+* Yatchew, A., 1998. “Nonparametric Regression Techniques in Economics,” Journal
+of Economic Literature, 37, 669-721. (Introduction)
+* Heckman, J. J. and E. J. Vytlacil, 1999. “Local Instrumental Variables and Latent
+Variable Models for Identifying and Bounding Treatment Effects,” Proceedings of the
+National Academy of Sciences, 96, 4730-4734.
+* Matzkin, R., 2007. “Nonparametric Identification,” Handbook of Econometrics, Volume
+6B, Chapter 73. (Introduction pages 5310 - 5312)
+
+**2. Univariate Density Estimation**
+
+* Henderson and Parmeter, Chapter 2
+
+* Li and Racine, Chapters 1 and 5
+
+**3. Multivariate Density Estimation**
+
+* Henderson and Parmeter, Chapter 3
+
+* Li and Racine, Chapter 1
+
+* Racine, J. and A. Ker, 2006. “Rating Crop Insurance Policies with Efficient Nonparametric
+Estimators that Admit Mixed Data Types,” Journal of Agricultural and
+Resource Economics, 31, 27-39.
+
+* Li, Q. and J. Racine, 2004. “Predictor Relevance and Extramarital Affairs,” Journal
+of Applied Econometrics, 19, 533-535.
+
+* Delgado, M. S., C. F. Parmeter, V. Hartarska and R. Mersland, 2015. “Should All
+Microfinance Institutions Mobilize Microsavings? Evidence from Economies of Scope”
+Empirical Economics, 48, 193-225.
+
+**4. Regression**
+
+* Henderson and Parmeter, Chapter 5
+
+* Li and Racine, Chapter 2
+
+* Ordas Criado, C., S. Valente and T. Stengos, 2011. “Growth and Pollution Convergence:
+Theory and Evidence,” Journal of Environmental Economics and Management,
+62, 199-214.
+
+* Henderson, D. J., C. Papageorgiou and C. F. Parmeter, 2012. “Growth Empirics
+without Parameters,” Economic Journal, 122, 125-154.
+
+* Delgado, M. S., D. J. Henderson and C. F. Parmeter, 2014. “Does Education Matter
+for Economic Growth?” Oxford Bulletin of Economics and Statistics, 76, 334-359.
+
+**5. Semiparametric Regression**
+
+* Henderson and Parmeter, Chapter 9
+
+* Li and Racine, Chapters 7-9
+
+* Anglin, P. M. and R. Gencay, 1996. “Semiparametric Estimation of a Hedonic Price
+Function,” Journal of Applied Econometrics, 11, 633-648.
+
+* Delgado, M. S., N. McCloud and S. C. Kumbhakar, 2014. “A Generalized Empirical
+Model of Corruption, Foreign Direct Investment, and Growth,” Journal of Macroeconomics,
+42, 298-316.
+
+* Ozabaci, D. and D. J. Henderson, 2015. “Additive Estimates of Returns to Schooling,”
+Empirical Economics, 48, 227-251.
+* Sam, A. G. and Y. Zheng, 2010. “Semiparametric Estimation of Consumer Demand
+Systems with Micro Data,” American Journal of Agricultural Economics, 92, 246-257.
+
+**6. Discrete Variables**
+
+* Henderson and Parmeter, Chapters 7-8
+
+* Li and Racine, Chapters 3-4
+
+* Min, I., C. Fang and Q. Li, 2004. “Investigation of Patterns in Food Away From
+Home Expenditure in China,” China Economic Review, 15, 457-476.
+
+* Wilson, P. W. and K. Carey, 2004. “Nonparametric Analysis of Returns to Scale in
+the US Hospital Industry,” Journal of Applied Econometrics, 19, 505-524.
+
+**7. Testing in Nonparametric Models**
+
+* Henderson and Parmeter, Chapter 6
+
+* Li and Racine, Chapters 12-13
+
+* Liu, W., 2014. “Modeling Gasoline Demand in the United States: A Flexible Semiparametric
+Approach,” Energy Economics, 45, 244-253.
+
+**8. Instrumental Variables**
+
+* Henderson and Parmeter, Chapter 10
+
+* Li and Racine, Chapters 16-17
+
+* Henderson, D. J., C. Papageorgiou and C. F. Parmeter, 2013. “Who Benefits from
+Financial Development? New Methods, New Evidence,” European Economic Review,
+63, 47-67.
+
+* Cohen, M., P. Shaw and T. Chen, 2008. “Nonparametric Instrumental Variable
+Estimation in Practice,” working paper.
+
+**9. Panel Data**
+
+* Henderson and Parmeter, Chapter 11
+
+* Li and Racine, Chapter 19
+
+* Zhang, J. and C. Wang, 2011. “Co-Benefits and Additionality of the Clean Development
+Mechanism: An Empirical Analysis,” Journal of Environmental Economics
+and Management, 62, 140-154.
+
+* Azomahou, T., F. Laisney and P. H. Van, 2006. “Economic Development and CO2
+Emissions: A Nonparametric Panel Approach,” Journal of Public Economics, 90,
+1347-1363.
+
+* Amini, S. M. S. Delgado, D. J. Henderson and C. F. Parmeter, 2012. “Fixed vs Random:
+The Hausman Test Four Decades Later,” Advances in Econometrics, Volume
+29, 479-513.
+
+**10. Constrained Nonparametric Estimation**
+
+* Henderson and Parmeter, Chapter 12
+
+* Parmeter, C. F., K. Sun, D. J. Henderson and S. C. Kumbhakar, 2014. “Estimation
+and Inference Under Economic Restrictions,” Journal of Productivity Analysis, 41,
+111-129.
+
+* Henderson, D. J., S. C. Kumbhakar, Q. Li and C. F. Parmeter, 2015. “Smooth Coefficient
+Estimation of a Seemingly Unrelated Regression,” Journal of Econometrics,
+189, 148-162.
