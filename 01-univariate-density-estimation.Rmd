@@ -1,0 +1,26 @@
+---
+title: 'Chapter 2: Univariate density estimation'
+output: html_document
+  pdf_document:
+    fig_caption: yes
+---
+
+# Univariate density estimation
+
+## Introduction
+
+The simpliest nonparametric density estimation is the histogram.  Assuming a pre-specified parametric density can show information that may be hidden otherwise.  However, the shape of the histogram is determined by the number bins assigned (binwidth) so careful consideration of the number of bins should be considered.  Another issue to be aware of is histograms are discontinuous in nature and important information may be omited (e.g. gradients).  The kernel density estimator provides a natural smoothing estimator that is continuous.
+
+## Smoothing preliminaries
+
+Kernel smoothing is an important method for estimating the density function; however, with insufficient smoothing the data may provide spurios information, or when over smoothing occurs, the information may be masked.  Thus, it is important to ensure kernel smoothing is done to extract the appropriate level of data.
+
+Types of kernel densities:
+
+```{r pressure, echo=FALSE}
+x<-seq(-4,4,length=200)
+y<-dnorm(x,mean=0, sd=1)
+plot(x,y, type = "l", lwd = 2, xlim = c(-3.5,3.5))
+```
+
+
