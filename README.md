@@ -1,3 +1,1 @@
-This is a minimal example of a book based on R Markdown and **bookdown** (https://github.com/rstudio/bookdown). Please see the page "Get Started" at https://bookdown.org/ for how to compile this example.
-
-You can find the preview of this example at https://bookdown.org/yihui/bookdown-demo/
+This repository provides bookdown files and R code for “Applied Nonparametric Econometrics Notes” by Parmeter and Henderson 2015. These notes follow the syllabus AGEC 690: Applied Nonparametric Econometrics. 

@@ -14,7 +14,7 @@ description: "Notes for Applied Nonparametric Econometrics (Parmeter and Henders
 
 # Overview
 
-This bookdown provides notes for "Applied Nonparametric Econometrics Notes" by Parmeter and Henderson 2015.  These notes follow the syllabus [AGEC 690: Applied Nonparametric Econometrics](https://ag.purdue.edu/agecon/Documents/690-3.pdf).
+This bookdown provides notes for "Applied Nonparametric Econometrics Notes" by Parmeter and Henderson 2015.  These notes follow the syllabus [AGEC 690: Applied Nonparametric Econometrics](https://ag.purdue.edu/agecon/Documents/690-3.pdf).  For bookdown files and R code see the Github repository: [johnwoodill/applied-nonparametric-econometrics-notes](https://github.com/johnwoodill/applied-nonparametric-economices-notes).
 
 Course Outline and Reading List:
 
