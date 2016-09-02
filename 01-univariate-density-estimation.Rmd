@@ -56,7 +56,7 @@ The figure above adjusts the bandwidth and shows the changes in the kernel densi
 
 ### A crude estimator (histogram)
 
-Suppose $S(x)=[a,b]$ is a subset of the domain not mapped to zero (support) where the binwidth is defined as $h=(b-a)/J$ where $J$ are number of boxes in histogram.  The interval is defined as $(a-(j-1)h,a+jh]$ for $j=1,2,...,J$.  Therefore, the number of observations $n_j$ is defined as:
+Suppose $S(x)=[a,b]$ is a subset of the domain not mapped to zero (support) where the binwidth is defined as $h=(b-a)/J$ where $J$ are number of boxes in histogram.  The interval is defined as $(a-(j-1)h,a+jh]$ for $j=1,2,...,J$.  Therefore, the number of observations $n_j$ in bin $j$ is defined as:
 
 $$n_j=\sum_{i=1}^n 1{a+(j-1)h < x_i \leq a+jh}$$
 
@@ -126,10 +126,8 @@ The design of the estimator ($f(\tilde{a})$) changes the bias and variance so di
 set.seed(1234)
 x <- rnorm(100)
 
-
 # Function to plot histogram with bins
 histogram <- function(x, bins = 5){
-  
   S <- range(x)
   a <- range(x)[1]
   b <- range(x)[2]
@@ -142,6 +140,7 @@ histogram <- function(x, bins = 5){
       if(x[i] > a + (j-1)*h && (x[i] <= a + j*h)) {n[j] <- n[j] + 1L}
     }
   }
+  
   # Manually add +1 to n[1] because lowest value is not included
   n[1] <- n[1] + 1
   barplot(n)
@@ -149,4 +148,70 @@ histogram <- function(x, bins = 5){
 }
 
 histogram(x, 10)
+```
+
+An expected density function where $\hat{f}(c) = \frac{n_j}{nh}$ can be plotted in R as:
+```{r hist_dens_estimator}
+# Sample data
+set.seed(1234)
+x <- rnorm(100)
+
+# Function to plot histogram with bins
+histogram <- function(x, bins = 5){
+  S <- range(x)
+  a <- range(x)[1]
+  b <- range(x)[2]
+  J <- bins
+  h <- (b - a)/J
+  n <- integer(J)
+  
+  for (j in 1:J){
+    for (i in 1:length(x)){
+      if(x[i] > a + (j-1)*h && (x[i] <= a + j*h)) {n[j] <- n[j] + 1L}
+    }
+  }
+  
+  # Manually add +1 to n[1] because lowest value is not included
+  n[1] <- n[1] + 1
+  return(n)
+}
+
+# New vector 
+expden <- integer(10)
+
+# Expected density function f(c) = n_j/h*n
+density_histogram <- function(x, bins = 5){
+    S <- range(x)
+    a <- range(x)[1]
+    b <- range(x)[2]  
+    J <- bins
+    h <- (b - a)/J
+    binlength <- histogram(x, bins)
+    
+    for (i in 1:length(binlength)){  
+      expden[i] <- binlength[i] / (h*length(x))
+    }
+     return(expden)
+}
+par(mfrow=c(3,2))
+# With 10 bins
+bins <- 10
+dat <- data.frame(x = seq(from = min(x), to = max(x), length.out = bins), 
+                  y = density_histogram(x, bins))
+barplot(histogram(x, bins), main = "Histogram with 10 bins")
+plot(dat, type = "l", main = "Density of Histogram with 10 bins")
+
+# With 20 bins
+bins <- 20
+dat <- data.frame(x = seq(from = min(x), to = max(x), length.out = bins), 
+                  y = density_histogram(x, bins))
+barplot(histogram(x, bins), main = "Histogram with 20 bins")
+plot(dat, type = "l", main = "Density of Histogram with 20 bins")
+
+# With 100 bins
+bins <- 100
+dat <- data.frame(x = seq(from = min(x), to = max(x), length.out = bins), 
+                  y = density_histogram(x, bins))
+barplot(histogram(x, bins), main = "Histogram with 100 bins")
+plot(dat, type = "l", main = "Density of Histogram with 100 bins")
 ```
