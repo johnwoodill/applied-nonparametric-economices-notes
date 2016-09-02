@@ -9,7 +9,7 @@ output: html_document
 
 ## Introduction
 
-The simpliest nonparametric density estimation is the histogram.  Assuming a pre-specified parametric density can show information that may be hidden otherwise.  However, the shape of the histogram is determined by the number bins assigned (binwidth) so careful consideration of the number of bins should be considered.  Another issue to be aware of is histograms are discontinuous in nature and important information may be omited (e.g. gradients).  The kernel density estimator provides a natural smoothing estimator that is continuous.
+A simple nonparametric density estimation is the histogram.  Assuming a pre-specified parametric density can show information that may be hidden otherwise.  However, the shape of the histogram is determined by the number bins assigned (binwidth) so careful consideration of the number of bins should be considered.  Another issue to be aware of is histograms are discontinuous in nature and important information may be omited (e.g. gradients).  The kernel density estimator provides a natural smoothing estimator that is continuous.
 
 ## Smoothing preliminaries
 
@@ -18,9 +18,135 @@ Kernel smoothing is an important method for estimating the density function; how
 Types of kernel densities:
 
 ```{r pressure, echo=FALSE}
-x<-seq(-4,4,length=200)
-y<-dnorm(x,mean=0, sd=1)
-plot(x,y, type = "l", lwd = 2, xlim = c(-3.5,3.5))
+par(mfrow=c(2,2))
+x <- seq(-4,4,length=200)
+y <- dnorm(x,mean=0, sd=1)
+plot(x,y, type = "l", lwd = 2, xlim = c(-3.5,3.5), main = "Normal density")
+
+x <- seq(0,6,length=200)
+y <- dlnorm(x, mean=0, sd=1)
+plot(x,y, type = "l", lwd = 2, xlim = c(0,6), main = "Log-normal density")
+
+x <- seq(-4,4,length=200)
+y <- dt(x, 5)
+plot(x,y, type = "l", lwd = 2, xlim = c(-3.5,3.5), main = "Student's t")
+
+x <- seq(-4,4,length=200)
+y <- dnorm(x,mean=0, sd=1)
+y <- density(y)
+plot(x=y$x*10, y=y$y/10, type = "l", main = "Mixture of normals")
+#plot(x,y, type = "l", lwd = 2, xlim = c(-3.5,3.5))
+```
+
+The smoothing parameter is an important control for uncovering features of the distribution.  The standard smooth parameter (`bw.nrd0`) defauls to 0.9 times the minimum of the standard deviation and the interquartile range divided by 1.34 times the sample size to the negative one-fifth power (See ??bandwidth and Silverman, 1986 page 48).  This rule-of-thumb automatically applies to the kernel density estimator, but can be changed by selecting a different bandwidth (e.g. smoothing based on one-tenth the variation).  By changing the smoothing parameter the shape of the distribution will change.  
+
+```{r pressure1, echo=FALSE}
+set.seed(201010)
+x <- rnorm(1000, 10, 2)
+par(mfrow = c(2,2))
+plot(density(x))  #A bit bumpy
+plot(density(x,adjust = 10)) #Very smmoth
+plot(density(x,adjust = .1)) #crazy bumpy
 ```
 
 
+The figure above adjusts the bandwidth and shows the changes in the kernel density estimator.  It is important to note the degree of smoothness is no more arbitraty than selections in parametric analysis.  The authors argue "the choice of parametric model is typically as ad hoc as picking the smoothing parameter, sometimes seemingly at random in applied economics."  The arbitrary selection in parametric analysis is just as selective to key insights as in nonparametric analysis.  Researchers should be aware of these choices when understanding important economic relationships from model selection.
+
+## Estimation
+
+### A crude estimator (histogram)
+
+Suppose $S(x)=[a,b]$ is a subset of the domain not mapped to zero (support) where the binwidth is defined as $h=(b-a)/J$ where $J$ are number of boxes in histogram.  The interval is defined as $(a-(j-1)h,a+jh]$ for $j=1,2,...,J$.  Therefore, the number of observations $n_j$ is defined as:
+
+$$n_j=\sum_{i=1}^n 1{a+(j-1)h < x_i \leq a+jh}$$
+
+where $1{A}$ is 1 if A is true and zero otherwise.  The Expected proportion of observations in jth interval can then be defined as:
+
+$$\frac{E[n_j]}{n} = Pr(a+(j-1)h < x \leq a+jh)= \int_{a+(j-1)h}^{a+jh} f(x)dx$$
+
+where $f(x)$ is the density of x.  Assuming $J$ is large $h$ becomes small.  Approximation can be assumed to be a constrant of $f(x)$ where $f(x) \approx f(c)$:
+
+$$\int_{b}^{a} cdx = cx \bigg|_{a}^{b} = c(b-a)$$
+Expectation of the value of density function in interval $(a+(j-1)h, a+jh])$:
+
+$$\frac{E[n_j]}{n} = \int_{a+(j-1)h}^{a+jh} f(x)dx \approx f(c) \underbrace{(a+jh-(a+(j-1)h)}_{\text{a+jh-a-jh+h=h} })=hf(c)$$
+$$\frac{E[n_j]}{n}=hf(c)$$
+Dividing by $h$, the expected density function is defined as:
+
+$$\hat{f}(c)=\frac{n_j}{hn} \hspace{5mm} \text{where} \hspace{5mm} c \in (a+(j-1), a+jh]$$ 
+
+--------------------------
+
+**Bias**
+
+Unless $c$ is exact point of interest (unlikely) the estimator is biased, discontinuous, and indifferentiable.  Bias for estimator $\hat{f}(c)$ is defined as:
+
+$$\text{Bias}[\hat{f}(c)]=E[\hat{f}(c)]-f(c) = E[\frac{n_j}{hn}]-f(c)$$ 
+
+$$\text{Bias}[\hat{f}(c)]=\frac{1}{h} \int_{a+(j-1)h}^{a+jh} f(x)dx - f(c)$$
+
+The mean value theorem says a point can exist between two values in an integral, such as $f'(c) = \frac{f(b)-f(a)}{b-a}$, therefore allowing the bias to reduced to the form:
+
+$$\text{Bias}[\hat{f}(c)]=f(\tilde{a})(a+jh - (a+(j-1)h))$$
+
+$$\text{Bias}[\hat{f}(c)]=hf(\tilde{a}) \hspace{5mm} \text{for} \hspace{5mm} \tilde{a} \in ((j-1)h,a+jh]$$
+
+If $c \equiv \tilde{a} $ then the estimator is unbiased:
+
+$$\text{Bias}[\hat{f}(c)]=\frac{1}{h}hf(\tilde{a}) - f(c)$$
+
+$$\text{Bias}[\hat{f}(c)]=f(\tilde{a}) - f(c) = 0$$
+It is important to note that bias does not depend on the sample size and is directly controlled by the binwidth.
+
+--------------------------
+
+**Variance (precision)**
+
+The variance of the estimator is defined as:
+
+$$Var[\hat{f}(c)] = Var(\frac{n_j}{nh}) = \frac{Var(n_j)}{(nh)^2}$$
+
+Know that $n_j$ is equal to the number of observations in interval and the probability of falling in the interval is defined as $p=f(\hat{a}h$ for $\tilde{a} \in (a+(j-1)h, a+jh)$ where a binomial distribution of $z \sim Bi(n,p) = np(1-p)$  Therefore, the variance can be expressed as:
+
+$$Var[\hat{f}(c)] = \frac{np(1-p)}{(nh)^2}= \frac{f(\tilde{a})h(1-f(\tilde{a})h)}{nh^2} =  \frac{f(\tilde{a})h(1-f(\tilde{a})h)}{nh} $$
+
+As $h \rightarrow 0$ the variance, $Var[\hat{f}(c)]$ increases.  Therefore, in the variance of the estimator, the sample size influences the size of the variance -- as the sample size increases the variance decreases.  
+
+The design of the estimator ($f(\tilde{a})$) changes the bias and variance so different designs may provide better bias and variance of the estimator.  The conflict between the bias and variance is a fundamental point in nonparametric estimation.
+* If $nh \rightarrow \infty$ and $h \rightarrow 0$ the bias and variance decreases, thus converging to mean square error.
+* More info on sample allows for the partitioning of $S(x)$, thus decreasing the bandwidtch and lowering the bias
+*However, $h$ cannot be lowered to offset gains in information, thus $\frac{h}{n} \rightarrow 0$.
+
+------------------------------
+
+**R Example**: A general histogram density estimator
+
+```{r histogram_estimator}
+# Sample data
+set.seed(1234)
+x <- rnorm(100)
+
+
+# Function to plot histogram with bins
+histogram <- function(x, bins = 5){
+  
+  S <- range(x)
+  a <- range(x)[1]
+  b <- range(x)[2]
+  J <- bins
+  h <- (b - a)/J
+  n <- integer(J)
+  
+  for (j in 1:J){
+    for (i in 1:length(x)){
+      if(x[i] > a + (j-1)*h && (x[i] <= a + j*h)) {n[j] <- n[j] + 1L}
+    }
+  }
+  # Manually add +1 to n[1] because lowest value is not included
+  n[1] <- n[1] + 1
+  barplot(n)
+  return(n)
+}
+
+histogram(x, 10)
+```
