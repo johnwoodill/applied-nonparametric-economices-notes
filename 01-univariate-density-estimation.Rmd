@@ -58,7 +58,8 @@ The figure above adjusts the bandwidth and shows the changes in the kernel densi
 
 Suppose $S(x)=[a,b]$ is a subset of the domain not mapped to zero (support) where the binwidth is defined as $h=(b-a)/J$ where $J$ are number of boxes in histogram.  The interval is defined as $(a-(j-1)h,a+jh]$ for $j=1,2,...,J$.  Therefore, the number of observations $n_j$ in bin $j$ is defined as:
 
-$$n_j=\sum_{i=1}^n 1{a+(j-1)h < x_i \leq a+jh}$$
+$$n_j=\sum_{i=1}^n 1 \{ \underbrace{a+(j-1)h < x_i \leq a+jh\}}_{\text{A}}$$
+
 
 where $1{A}$ is 1 if A is true and zero otherwise.  The Expected proportion of observations in jth interval can then be defined as:
 
@@ -91,7 +92,7 @@ $$\text{Bias}[\hat{f}(c)]=f(\tilde{a})(a+jh - (a+(j-1)h))$$
 
 $$\text{Bias}[\hat{f}(c)]=hf(\tilde{a}) \hspace{5mm} \text{for} \hspace{5mm} \tilde{a} \in ((j-1)h,a+jh]$$
 
-If $c \equiv \tilde{a} $ then the estimator is unbiased:
+If $c \equiv \tilde{a}$ then the estimator is unbiased:
 
 $$\text{Bias}[\hat{f}(c)]=\frac{1}{h}hf(\tilde{a}) - f(c)$$
 
@@ -106,16 +107,19 @@ The variance of the estimator is defined as:
 
 $$Var[\hat{f}(c)] = Var(\frac{n_j}{nh}) = \frac{Var(n_j)}{(nh)^2}$$
 
-Know that $n_j$ is equal to the number of observations in interval and the probability of falling in the interval is defined as $p=f(\hat{a}h$ for $\tilde{a} \in (a+(j-1)h, a+jh)$ where a binomial distribution of $z \sim Bi(n,p) = np(1-p)$  Therefore, the variance can be expressed as:
+Know that $n_j$ is equal to the number of observations in interval and the probability of falling in the interval is defined as $p=f(\hat{a})h$ for $\tilde{a} \in (a+(j-1)h, a+jh)$ where a binomial distribution of $z \sim Bi(n,p) = np(1-p)$  Therefore, the variance can be expressed as:
 
 $$Var[\hat{f}(c)] = \frac{np(1-p)}{(nh)^2}= \frac{f(\tilde{a})h(1-f(\tilde{a})h)}{nh^2} =  \frac{f(\tilde{a})h(1-f(\tilde{a})h)}{nh} $$
 
 As $h \rightarrow 0$ the variance, $Var[\hat{f}(c)]$ increases.  Therefore, in the variance of the estimator, the sample size influences the size of the variance -- as the sample size increases the variance decreases.  
 
 The design of the estimator ($f(\tilde{a})$) changes the bias and variance so different designs may provide better bias and variance of the estimator.  The conflict between the bias and variance is a fundamental point in nonparametric estimation.
+
 * If $nh \rightarrow \infty$ and $h \rightarrow 0$ the bias and variance decreases, thus converging to mean square error.
+  
 * More info on sample allows for the partitioning of $S(x)$, thus decreasing the bandwidtch and lowering the bias
-*However, $h$ cannot be lowered to offset gains in information, thus $\frac{h}{n} \rightarrow 0$.
+  
+* However, $h$ cannot be lowered to offset gains in information, thus $\frac{h}{n} \rightarrow 0$.
 
 ------------------------------
 
@@ -215,3 +219,121 @@ dat <- data.frame(x = seq(from = min(x), to = max(x), length.out = bins),
 barplot(histogram(x, bins), main = "Histogram with 100 bins")
 plot(dat, type = "l", main = "Density of Histogram with 100 bins")
 ```
+
+### Naive estimator
+
+With a crude estimator, bias varies considerable.  To overcome this, boxes at each point can be centered on each obs as:
+
+$$n_x=\sum_{i=1}^{n} 1 \{ x-h < x_i \leq x+h \}$$
+
+therefore,
+
+$$\hat{f}(x) = \frac{n_x}{2nh} = \frac{1}{2nh} \sum_{i=1}^{n} 1 \{ x-h < x_i \leq x+h \}$$
+
+Conveniently, the density estimator can be defined as:
+
+$$\hat{f}(x) = \frac{1}{nh} \sum_{i=1}^{n} (1/2) 1 \{ | \frac{x_i - x}{h} | \leq 1 \}$$
+
+The derivative of expected cumulative density function (ECDF) is an equivalent density estimator:
+
+$$\hat{F}(x) = \frac{1}{n} \sum_{i=1}^{n} 1 \{ x_i \leq x \}$$
+
+where $f(x) = \frac{d}{dx}F(x)$
+
+The numerical derivative is exactly the same as the naive estimator.
+
+Now, assume the kernel function, $k(\psi)$ is defined as:
+
+$$k(\psi)= (1/2) 1 \{| \frac{x_i - x}{h} | \leq 1 \} $$
+
+where $k(\psi)$ is equal to one if $|\psi| \leq 1$
+
+Uniform kernel is defined as the variety of weighting function to construct nonparametric estimates:
+
+* Discontinuous at -1 and 1
+
+* Derivative of zero everywhere by at -1 and 1
+
+* Therefore, the density estimator will not be smooth
+
+For a function to be a probability density it must be non-negative and integrate to 1.  A check on this shows:
+
+$$k(\psi) \geq 0 \hspace{3mm} \forall \hspace{3mm} \psi$$
+
+
+$$\int_{S(x)} \hat{f}(x)dx = 1$$
+
+-------------------------------------------
+
+### Kernel estimator
+
+A generic definition for a kernel density:
+
+$$\hat{f}(x) = \frac{1}{nh} \sum_{i=1}^{n} K(\frac{x_i - x}{h})$$
+
+Where $h$ is the bandwidth providing smoothness of the estimator.  It is important to select kernel functions that are smoother than uniform kern by selection of $k(\psi)$ and $h$ for correct selection fo estimator.
+
+Let,
+
+$$k_j(k) = \int_{- \infty}^{\infty} \psi^{j}k(\psi)d\psi  $$
+If $k_0(k)=1, k_1(k)=0,$ and $k_2(k) < \infty$ is kernal of second order, then imposing integration to unity ($k_0(k)=1$) ensures a PDF.
+
+* $k_1(k)=0$ allows for symmetritry about zero ($k(- \psi) = k(\psi))$)
+
+* $k_2(k) < \infty $ allows for finite variance and is necessary for bias of variance estimator
+
+For symmetric kernels $k_l(k)=0$ for $l=2j+1$ (all odd)
+
+**Figure of most common kernels**
+
+![](/run/media/john/1TB/Projects/applied-nonparametric-economices-notes/Figures/common_kernel_functions.png)
+
+![](/run/media/john/1TB/Projects/applied-nonparametric-economices-notes/Figures/common_kernel_functions2.png)
+
+All kernels in figure stem from general polynomical family where,
+
+$$k_s(\psi)=\frac{(2s+1)!!}{2^{s+1}s!}(1-\psi^{2} 1 \{ | \psi | \leq 1 \}$$
+
+where $(2s+1)!!=(2s+1)(2s-1) \cdot \cdot \cdot 5 \cdot 3 \cdot 1$ and $s$ is biweight kernel ($s=2$) "quartic kernel."  As s increases the kernel gains additional derivatives.
+
+Reweighting kernel to Gaussien kernel gives a PDF of standard nromal with derivaties of all orders.  Reweighting to a scaled kernel ($b^-1 k * (\frac{\psi}{b}$ with bandwidth ($h*=\frac{h}{b}$) produces an identical estimate of $k(\psi)$ and $h$
+
+$$\hat{f}(x) = \frac{1}{nh} \sum_{i=1}^{n}k (\frac{x_i-x}{h})$$
+$$\hat{f}(x) = \frac{1}{nh/b} \sum_{i=1}^{n} b^{-1} k (\frac{x_i-x}{bh/b})$$
+
+$$\hat{f}(x) = \frac{1}{nh*} \sum_{i=1}^{n}k* (\frac{x_i-x}{h*})$$
+
+Selecting the correct scale for the data ensures appropriate estimation.
+
+-------------------------------------------
+
+**Bias and Variance**
+
+With basic properties established we can now analyze the bias and variance.  To provide bandwidth and kernel selection, the bias of kernel density estimation is:
+
+$$Bias[\hat{f}(x)]=E[\hat{f}(x)] - f(x) \approx \frac{h^2}{2} f^{(2)}(x)k_2(k)$$
+
+Where $f^{(2)}$ is the second order derivative.  In nonparametric analysis the bias reveals:
+
+* Bias is independent of sample size
+
+* Bias depends on design of $f^{(2)}.  Certain portions of density may have lower bias.  The steeper the density, the larger the bias (larger $f^{(2)})$$
+
+* Bias depends on kernel used in $k_2(k)$
+
+* Bias depends directly on bandwidth.  As the bandwidth decreases, estimation bias decreases; however, decreasing bandwidth also icnreases variance.
+
+Variance of density estimator can be derived as (See technical appendix 2.4 for detailed derivation):
+
+$$Var[\hat{f}(x)] \approx \frac{1}{nh} f(x) R(k)$$
+
+where $R(k) = \int g(\psi)^{2} d\psi$ and is thought of as the "difficult" of kernel function.
+
+The variance depends on sample size, bandwidth, design, and kernel employed.  Reducing the bandwidth increases the variance, but a var decrease with increasing sample size.  Combingin bias and variance into an asymptotic mean square error (AMSE) of density estimator:
+
+$$AMSE[\hat{f}(x)] = \text{Bias}[\hat{f}(x)]^2 + \text{Var}[\hat{f}(x)] $$
+
+$$AMSE[\hat{f}(x)] = \frac{k_2^2(k)}{4} f^{(2)}(x)^2h^4+(nh)^{-1} f(x)R(k)$$
+
+and shows the bias-variance trade off where the bias can be reduced at the expense of variance.  As $n \rightarrow \infty, h \rightarrow 0$, but bandwidth decreases slow enough so $nh \rightarrow \infty$.  If $h$ decreases too rapidly then gains in bias reduction are offset by increases in variance.  This is the fundamental relationship between bias and variance in nonparametric estimation.
+
