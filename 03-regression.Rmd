@@ -1,0 +1,425 @@
+---
+title: 'Chapter 4: Regression'
+output: html_document
+---
+
+# Regression
+
+The majority of economic research assumes regression enter the conditional mean linearly and each regressor is separable without any theoretical justification.
+
+Parametric estimates are considered global estimators, non-parametric estimates are local estimators using local sample points.  We choose a method that uses indicator functions to evaluate conditional mean by calculating the average value of the dependent variable at specific values of covariates.
+
+Three popular estimators for estimating the unknown smoothing function.
+
+* Local-constant-least-squares (LCLS) - weighted average of left hand side variable
+
+* Local-linear-least squares (LLLS) - fit a line local to $X$ with local information to construct estimator controlled by a bandwidth 
+  
+    * Usually more accurate measure and provides first derivative of conditional mean
+
+* Local Quadratic Least Squares (LQLS) - instead of using first-order taylor expansion, this estimatioin uses higher order 
+  
+    * Can estimated condition mean, gradient, and Hessian simultaneously.
+
+## Smoothing Preliminaries
+
+To build intution, lets provide an example:  Suppose condition mean of joint density is
+
+$$E(y|x) = x + 2e^{-16x^2}$$
+
+And generate 100 sample points with standard normal to show how standard parameters modeling fails:  Look at points around zero
+
+**Plot true points, linear etc**
+
+Figure 5.1
+
+Now plot as 10th order polynomial and True
+
+Figure 5.2
+
+This provides a more accurate fit around zero, but at the expense of global linear structure.  However, the 10th order detects the hump it still does not uncover the share of thefunction.
+
+A naive nonparametric estimator instead of parametric model suppose instead we average 10 points, surrounding a given point.
+
+* Take five closest points and construct estimate
+
+Figure 5.3
+
+Note the fit is much closer and representative of the data.
+
+For non-parametric analysis assume
+
+$$y_i = m(x_i) + u_i$$
+
+Where as OLS assumes $y = \alpha + x_i \beta$, which may introduce bias if not known.
+
+## Local-Constant Estimator
+
+Three approaches are outlined that give same estimate of the conditional mean
+
+### Derivation from density estimators
+
+Conditions mean of $y$ is defined as
+
+$$E(y|x) = \frac{\int y f(y,x)dy}{f(x)}$$
+
+$$\hat{E}(y|x) = \hat{m}(\mathbf{x}) = \frac{\frac{1}{n|h|} \sum_{i=1}^{n} K_h (x_i, x) y_i}{\frac{1}{n|h|} \sum_{i=1}^{n} K_h (x_i,x)} = \frac{\sum_{i=1}^{n} K_h (x_i, x) y_i}{\sum_{i=1}^{n}K_h (x_i,x)} = \sum_{i=1}^{n} A_i (x) y_i$$
+
+Conditiona mean is simply a weighted average of our regressionas, where eights depend on covariates
+
+The form $A_i(x)$ is the only thing that change, with other estimators
+
+### An indicator approach
+
+Suppose we have a single regressor.  Now possible to construct a naive estimator for a conditional mean of $y$, $m(x)$, average close to observations.
+
+$$\hat{m}(\mathbf{x}) = \frac{1}{n_x} \sum_{i \in S(x)}y_i$$
+
+Therefore, naive conditional mean estimator is:
+
+$$\hat{m}(\mathbf{x}) = \frac{\sum_{i=1}^{n} \mathbf{1} \{ |x_i - x| \leq h \ y_i}{\sum_{i=1}^n \mathbf{1} \{ |x_i - x| \leq h \}}$$
+
+This is a uniform kernel, the same as in 5.2.1 equation where $A_i (x) = 1{|x_i - x| \leq h}/n_x$
+
+### Kernel regression on a constant
+
+Instead of deriving conditional mean from non uniform estimator of conditional density, we can instead think of an unknown function $(m(x))$ that minimizes the weighted square distance between the function itself and y.  Therefore, a weighted average where weights vary by x.
+
+Taking from OLS estimator:
+
+$$\min_{\alpha} \sum_{i=1}^{n}[y_i - m(x)]^2 K_h (x_i,x)$$
+
+where, 
+
+$$-2 \sum_{i=1}^{n}(y_i - a) K_h (x_i,x) = 0$$ 
+
+therefore identical to the base equation in 5.2.1 where new estimator is 
+
+$$a = \hat{m}(\mathbf{x}) = \frac{\sum_{i=1}^{n} K_h (x_i, x) y_i}{\sum_{i=1}^{n}K_h (x_i,x)}$$
+
+where $t$ is an $nx1$ vector of one
+
+Figure 5.4
+
+LCLS estimator will be smoother than crude averages.
+
+## Bias, variance, and AMISE of the LCLS estimator
+
+$$Bias[\hat{m}(\mathbf{x})] \approx \frac{k_2}{2 f(x)} \sum_{d=1}^{q}h_d^2 B_d(x)$$
+
+Notice bias is independent of the sample size expect in presence of bandwidths.  Estimator also has no bias when estimating a constant, which is inappropriate for anonparametric estimate.  Even if data is from a lienar relationship, bias still exists for LCLS.
+
+It should be noted that LCLS is deisgn dependent and the distribution of data can have an effect on the LCLS estimator.
+
+Consider variance of LCLS estimator:
+
+$$Var[\hat{m}(\mathbf{x})] \approx \frac{\sigma^2}{f(x) (n|h|} \int K(t)^2 dt = \frac{\sigma^2 R(k)^q}{f(x)(n|h|}$$
+
+Variance of the LCLS estimator depends on error variance, $\sigma^2$, the sample size on the bandwidths and on the kernel chosen.  
+
+The explicit feature of the function is not in the vairance, since a nonparametric estimator depends onthe function arbitrarily; that is, any function estimate.
+
+The cause of the variance is the variance error and just the rffucntion itself.  This is important because with highly non linear function, the variance does not arbitrarily increase due to the function (such as the case with OLS assumptions)
+
+Another important note isthe vairance of the density estimator is directly related to the deisgn density where the variance of the density estimate is directly proportional to the design ensity.  With regard to AMISE, the integration removes the design variance component.  For the regression context this is not the case
+
+* A higher density in a region leads to a higher variance of the density estimator
+
+* A lower density region will lead to higher variation in estimator
+
+Therefore, 
+
+$$AMSE = Bias[(\hat{m}(\mathbf{x})] + var[\hat{m}(\mathbf{x})]$$
+
+Notice a standard bias trade-off with bandwidth parameter.  Consistency is achieved with icnreasing sample size, bandwidth shrinks, but slower than sample size.
+
+## Bandwidth Selection
+
+Data-driven methods for bandwidth selecction is prefered.
+
+### Univariate digression
+
+The choice of kernel in regression is equivalent to choice of kernel in the dnesity settingbecause the AMISE for LCLS estimate looks identical to AMISE for univariate kernel.
+
+Optimal $h$ for univariate case:
+
+$$h_{opt} = [R(k)/4k_2^2]^{1/5} [\sigma_u / \gamma]^{2/5} (b-a)^{1/5} n^{-1/5}$$
+
+As a simple case, the rule-of-thumb bandwidth depends on 5 different features
+
+* Sample size
+
+* Range of $x$ values
+
+* $b-a$ (from design of density)
+
+* variance of errors from regression
+
+* choice of kernel
+
+$$h_{rot} = 0.6306 [\hat{\sigma_u} / \hat{\gamma}]^{2/5} (x_{0.90} - x_{0.10})^{1/5} n^{-1/5}$$
+
+Even in the simple case, deriving features can be cumbersome and introduce issues.  This is why data-driven methods are prefered.
+
+### Optimal bandwidth in higher dimensions
+
+When determing $h_d$ when $q \leq 1$ (dimensions) there are no closed form solutions.  In nonparametric regression we want the same rates for all bandwidths.  Bandwidths are specified as
+
+$$h_d= c_d \sigma_{x_d}^2 n^{-1/(4+q)}$$
+
+### Least-squares cross validation
+
+Applied non-parametric papers rely on cross-validation to determine appropriate amount of smoothing.
+
+$$LSCV(h) = \sum_{i=1}^{n}[y_i - \hat{m}_{-i} (x_i)]^2$$
+
+With a leave-one-out estimator is defined as:
+
+$$\hat{m}_{-i} = \frac{\sum_{j=1, j \neq i}^n y_j K_h (x_j, x_i)}{\sum_{j=1, j \neq i}^n K_h (x_j, x_i)}$$
+
+Two points of interest:
+
+* $m(\cdot)$ is replaced with left-hand-side, $y$, because $m(\cdot)$ is not observed.  When assumed, $E(u|x)=0, $y_i = m(x_i)$
+
+* Leave-one-out estimator involves a calculation
+
+Cross-validation, such as LCSV, are designed to select bandwidths to balance trade-off because bias and variance.
+
+### Cross-validation based on AIC
+
+Similar to Kullback-Leibler info criterion as a basis for likelihood cross-validation in density estimation.
+
+$$AIC_c (h) = ln(\hat{\sigma}^2) + \frac{1 + tr(H)/n}{1 - (tr(H)+2)/2}$$
+
+AIC generally provides larger bandwidths than those by LCSV,w ith less variability of estimates of conditional mean.
+
+AIC delivers improved performance when compared to LSCV, but as stated before, a larger bandwidth.  As siample size increases, these gains disappear.
+
+### Interpretation of bandwidth for LCLS
+
+In large samples, will see bandwidths close to zero.  Infinite samples, it is impossible to know how close to zero, but comparing standard deviation to bandwidth can help determine whether it is accurate.  If standard deviation = 3 x bandwidth then you can be confident the bandwidth is large.
+
+With large bandwidth, the term within the kernel is small and does not depend on $i$; thus, the variable is irrelevant in terms of smoothing, but does not suggest the variable is insignificant (statistically).  The variable can be removed from smoothing procedure due to large bandwidth -- known as "automatic diminsion reduction".
+
+When bandwidth is small, the variable is relatively smooth.
+
+With a small sample size, LSCV bandwidth performs well in removing variables.  As diminsions, $(q_r \& q_{ir})$, increases this ability diminshes; therefore, including many irrelevant variables remoes the ability of LSCV to remove variables.
+
+## Gradient estimation
+
+Taking the analytical derivative of a particular regression provides the gradient using a partial derivative.
+
+For a Gaussian kernel:
+
+$$\frac{\partial K_h (x_i, x)}{\partial x_d} = \Bigg( \frac{x_{id}-x_d}{h_d^2} \Bigg) K_h (x_i, x)$$
+The rate of convergence is slower for the derivative and bandwidth will change.
+
+## Limitations of LCLS
+
+Bias of local-constant estimation is biased but is dependent of first and second derivatives.  If underlying function is constant, then LCLS is unbiased; however, it is known to be constant then no need for nonparametric estimation.
+
+In general, the local constnat estimator will produce non-linear curve.  Increasing bandwidth, increases bias, thus reducing to a flat line and failing to detect linear relationship.
+
+FIGURE 5.5 AND 5.6
+
+From Figure 5.6, if bandwidth = 0 (because no error in variance), but if noise is present the plot would have dramatic consequences.  As smoothing increases, estimation simplifies to a constant.
+
+## Local-linear estimation
+
+Local-linear approximation can be viewed as a local taylor expansion, such as:
+
+$$y_i = m(x_i + u_i) \approx m(x) + (x_i - x) \beta(x) + u_i$$
+
+But instead of higher order approximation, $m(x) \text{&} \beta(x)$ are parameters where minimization problem is:
+
+$$\min_{a,b} \sum_{i=1}^n [y_i - a - (x_i - x)b]^2 K_h (x_i,x)$$
+
+Therefore, 
+
+$$\hat{\delta}(x) = (\mathbf{X}'K(x) \mathbf{X})^{-1} \mathbf{X}'K(x)y$$
+
+With a bias and variance of:
+
+$$Bias[\hat{m}(\mathbf{x})] \approx \frac{k_2}{2} \sum_{d=1}^q h_d^2 m_{dd}(x)$$
+
+$$Var[\hat{m}(\mathbf{x})] \approx \frac{R(k)^q \sigma^2}{n|\mathbf{h}|f(x)}$$
+
+Regardless of sample size and bandwidth, underlying function is linear and no bias (note the case with local-constant because fo dependency of gradients) also local linear and local constant have the same variance.
+
+Local-linear provides info about function and gradients, which local-constant does not provide.  Also $\hat{\beta}(x)$  is not equivalent to actual gradients due to taylor approximation.  LLLS numerical and analytical gradient are different.
+
+### Choosing LLLS over LCLS
+
+When estimating nonparametric equivalent of linear probability model (dummy) LCLS ensures fitted values are bound by zero and one (LLLS will not).  When estimating conditional volatility (time series) LCLS ensures non-negative.
+
+However, most employ LLLS estimation because:
+
+* LLLS bias is improved
+
+* minmax efficiency
+
+**simplier bias**
+
+Two bias features make LLLS estimator more desirable:
+
+* If underlying function is linear, then estimator is unbiased where LCLS estimator is not
+
+* Expected conditional on $x$ produces an unbiased estimator because conditional mean is linear and $E(u|x)=0$
+
+### Efficiency of the local-linear estimator
+
+Fan (1992) establishes that the local-linear estimator is the best linear smoother over all linear smoothers; further, local constant kernel regression estimator is found to have zero efficiency relative to local-linear smoother.  Epanechnikov kernel is optimal kernel of local linear estimator.
+
+The intution for local constant setup says, a locally parametric model that only fits a constant would implicity act as though no covariates enter the model, whereas with a locally parametric model that fits a line, the model acts as though covariance enter the model in a meaninful manner.  Therefore, LCLS is preferred over LCLS.
+
+## Local-polynomial estimation
+
+Taking higher order Taylor approx (second-order) is the method behind local-quadratic least-squares (LQLS).  LQLS estimator provides conditional mean, gradient, and Hessian simultaneously.
+
+More expansions will result in a reduction in bias, but increase variability; primarily due to the increase in the number of local parameters.
+
+* Standard rule is interested in pth gradient, then use $(p+1)$th order expansion.
+
+For a pth order Taylor expansion assume $(p+1)$th derivative conditional mean at point $\mathbf{x}$ where
+
+$$y_i \approx m(x) + (x_i -x) \frac{\partial m(x)}{\partial x} + (x_i - x)^2 \frac{\partial^2 m(x)}{\partial x^2} \frac{1}{2!} + ... + (x_i - x)^p \frac{\partial^p m(x)}{\partial x^p} \frac{1}{p!} + u_i$$
+
+With kernel weighted least-squares:
+
+$$\min_{a_0, a_1, ... , a_p} \sum_{i=1}^n [y_i - a_0 - (x_i - x)a_i - (x_i - x)^2 a_2 - ... - (x_i - x)^p a_p]^2 K_h(x_i,x)$$
+
+As matrix notation:
+
+$$\min_{\delta} (y - \mathbf{X} \delta)' K(x)(y- \mathbf{X} \delta)$$
+$$\hat{\delta}(x) = \Bigg(\hat{m}(x), \frac{\partial \hat{m}(x)}{\partial x} , \frac{\partial^2 \hat{m}(x)}{\partial x^2}, ... , \frac{\partial^p \hat{m}(x)}{\partial x^p} \Bigg) = [\mathbf{X}'K(x) \mathbf{X}]^{-1} \mathbf{X}' K(x)y$$
+
+Kernel choice is important because as the polynomial increases, variability of estimate on conditional mean increases.  Unform kernel gives highest increase in variability, and Gaussian kernel will exhibit lowest variability.  This is generally why Gaussian kernel is used mostly by economists.
+
+For $q > 1$ as $q$ increases the number of local estimates increases, even if $p$ remains constant (curse of diminisionality) this suggests there are trade-offs between flexibility and overfitting
+
+TABLE 5.1
+
+Anything past a second-order Taylor approx leads to results with too much variability
+
+## Gradient-based bandwidth selection
+
+Main idea is to facilitate determination of the bandwidth for estimating the gradient:
+
+$$\min_{h} \sum_{i=1}^n [\beta(x_i) - \hat{\beta}_{-i}(x_i)]^2$$
+
+The criterion is identical to LSCV, except the minimization is the squared difference between the estimated and true gradients and that $\beta(x_i)$ is unobserved.
+
+Using a local-polynomial estimator to calculate noice-corrupted version of $\beta{x_i}$ to replace $\beta(x_i)$ in previous equation using a gradient based cross-validation procedure.
+
+$$\min_{h} \sum_{i=1}^n [\tilde{\beta}(x_i) - \hat{\beta}_{-i}(x_i)]^2$$
+
+Where $\tilde{\beta}(x_i)$ is local-quadratic estimator and $\hat{\beta}(x_i)$ is leave one out.
+
+* Using local-quadratic estimator allows moethods in higher dimensions
+
+* using local-cubic estimator for $\tilde{\beta}(x_i)$ coupled with local-linear $\tilde{\beta}_{-i}(x_i)$
+
+In q-dimension setting, the gradient based cross-validation is:
+
+$$\min_{h} \sum_{i=1}^n [\tilde{\beta}(x_i) - \hat{\beta}_{-i}]'[\beta(x_i) - \hat{\beta}_{-i}(x_i)]$$
+
+## Standard errors and confidence bands
+
+Generally, bootstrap procedures are used to estimated standard errorsa dn confidence bands and depends on whether or not the data is homoskedastic:
+
+* Homoskedastic: use either pairs or residual bootstrap
+
+* Heteroskedastic: use wild bootstrap
+
+**A typical mistake is to include the derivative from the Taylor expansion only include estimated conditional mean when obtaining residuals $\hat{u}_i = y_i - \hat{m}(x_i)$**
+
+### Pairs bootstrap
+
+Basis idea is to randomly sample points with replacement and repeat $n$ times.
+
+* Valid for heteroskedastic case because it permits condtional variance of errors it does not offer an asymptotic refinement as it does not assume conditional mean of errors equal to zero.
+
+One issue that arise is how to estimate the model because the model needs to be estimated at the same points; therefore, estimation satisfied:
+
+$$\hat{m}(\mathbf{x}) = \frac{\sum_{i=1}^n y_i^* K_h (\mathbf{x}_i^*,\mathbf{x})}{\sum_{i=1}^n K_h(\mathbf{x}_i^*, \mathbf{x})}$$
+
+Steps to obtain standard errors of paris bootstrap:
+
+* Randomly sample with replacement where replacement sample is $\{ y_i^*, \mathbf{x}_i^* \}^n_{i=1}$
+
+* using bootstrap sample, estimate $\hat{m}^*(x)$ and/or $\hat{\beta}^*(\mathbf{x})$
+
+* repeat steps 1 and 2 and construct sample distribution of bootstrap estimates standard error and confidence bands can then be estimated.
+
+### Residual bootstrap
+
+Residual bootstrap steps are very similar, but instead resample residuals.
+
+Steps to produce residual bootstrap:
+
+* randomly sample with replacement centered residuals from $\{ u_i^* = \hat{u}_i - \check{u} \}^n_{i-1}$ and construct left hand side variable $y_i^* = \hat{m}(x_i) + u_i$ where resulting sample is $\{ y_i^*, x_i \}^n_{i=1}$
+
+* Using bootstrap sample stimator known $\hat{m}^*(x)$ and/or $\hat{\beta}(x)$ via initial estimator $y_i$
+
+* Repeat steps 1 and 2 and construct sample distribution of bootstrap estimates standard error and confidence bands can then be estimated.
+
+### Wild bootstrap
+
+Wild bootstrap is typically preferred because it is consistent under both homoskedastic and heteroskedastic, but is not applicable in all areas of econometrics because of asymptotic validity.
+
+The idea is the same as residual bootstrap, but the $i^{th}$ (centered) residuals is not shared by other observations
+
+Steps for calculating wild bootstrap:
+
+* Compute bootstrap errors from recentered residuals by $u_i^* \frac{1 - \sqrt{5}}{2} (\hat{u}_i) - \check{u}$ with probability $(1+ \sqrt{5})/(2 \sqrt{5})$ and $u_i^* = \frac{1 + \sqrt{5}}{2} (\hat{u}_i - \check{u})$ with probability $1-(1 + \sqrt{5})/(2 \sqrt{5})$ to generate $y_i^*$ via $y_i^* = \hat{m}(x_i) + u_i^*$.  Bootstrap sample is $\{ y_i^*, x_i \}^n_{i=1}$
+
+* Using bootstrap sample stimator known $\hat{m}^*(x)$ and/or $\hat{\beta}(x)$ via initial estimator $y_i$
+
+* Repeat steps 1 and 2 and construct sample distribution of bootstrap estimates standard error and confidence bands can then be estimated.
+
+## Displaying estimates
+
+Because nonparametric analysis does not have parameter estimates there is no exact comparison with standard approaches.
+
+Ths most general approach is to present tables with quartile and/or decile estimates of the estimated gradients.  These are most similar to estiamtes of comparison by looking at changes of derivative, or gradient of regression estimation.
+
+Visual approaches include partial mean plots and 45 $^{\circ}$ plots:
+
+* Partial mean plots: relationship between conditional mean or gradient against the covariate, holding other covariates at fixed mean levels
+
+    * not always appropriate for economic interrpretation when holding more covariates at fixed
+    
+* 45 $^{\circ}$ plots can over these limitations by conveying information about the estimated nonparametric (function or gradient) against itself at 45 $^{\circ}$ angle
+
+    * allows to discern spread of estimates and statistical significance
+    
+Can also plot kernel density of gradient estiamtes, and can even be sub-divided based on another variable.
+
+### Assessing fit
+
+$R^2$ can be used in nonparametric models to assess the goodness of fit.
+
+$$R^2 = \frac{[\sum_{i=1}^n (y_i - \bar{y})(\hat{y}_i - \bar{y})]^2}{\sum_{i=1}^n (y_i - \bar{y}) \sum_{i=1}^n (\hat{y}_i - \bar{y})}$$
+
+### Predictions
+
+Another approach to assessing a nonparametric model is to compare their predictive ability (e.g. comparing $R^2$ across competing models but doesn't account for complexity).  Can also use in-sample measures of fit, such as adjusted $R^2$ or AIC; although, these measures have their own flaws.  And a final appraoch is to compare out of sample predictions.
+
+Racine and Parametric (2013) propose random sample with plots to construct evaluation and training data sets, repeated a large number of times.  The model with smallest ASPE is deemed model with lowest average prediction error.
+
+The procedure from Racine and Parmeter (2013):
+
+* Resample without replacement pairwise from $\{ y_i, \mathbf{x}_i \}^n_{i=1}$ with resamples defined as $\{ y_i^*, \mathbf{x}_i \}^n_{i=1}$
+
+* Let the first $n_1$ of resampled observation of training sampleused to smooth over.  The remaining $n_2 = n - n_1$ are evaluation sample $\{ y_i^*, \mathbf{x}_i^* \}^n_{i=1}$
+
+* fit model 1 and 2 using training observations and obtain predicted values from evaluation observations
+
+$$ASPE^1 = n_2^{-1} \sum_{i=n_1 + 1}^n y_i^*  - \hat{m}_{n_1}^1 (\mathbf{x}_i^* \}^2$$
+
+$$
+
+* compute ASPE of each model where $ASPE^1 = n_2^{-1} \sum_{i=n_1 + 1}^n y_i^*  - \hat{m}_{n_1}^1 (\mathbf{x}_i^* \}^2$ and $ASPE^2 = n_2^{-1} \sum_{i=n_1 + 1}^n y_i^*  - \hat{m}_{n_1}^2 (\mathbf{x}_i^* \}^2$
+
+repeat steps 1 - 3 a large number of times and use paired t-test to asses $H_0: \overline{ASPE^1} = \overline{ASPE^2}$
+

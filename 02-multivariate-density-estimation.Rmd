@@ -1,0 +1,106 @@
+---
+title: 'Chapter 3: Multivariate density estimation'
+output: html_document
+---
+
+# Multivariate density estimation
+
+## Joint Density
+
+Use a vector of bandwidths because difference levels of smoothness in different dimensions offers a more general setting and recognizes individual variables have different scales.
+
+Multivariate kernel density estimator:
+
+$$\hat{f}(x) = (n|h|)^{-1} \sum_{i=1}^{n} k_h(x_i,x)$$
+
+The produce kernel contrusts the multivariate kernel assumed inderpenced smong covariate
+
+## Bias, Variance, and AMISE
+
+Two aspects that influence statistical properties are:
+
+* Order of kernel
+
+* Difficulty factor of kernel
+
+$$Bias[\hat{f}(x)] = \approx \frac{k_2()k}{2} \sum_{d=1}^{q} \frac{\partial^2f(x)}{\partial x^2_d} h^2_d$$
+
+Bias is not influenced by sample size, kernel influences bias through the variance, and second partial derivaties are underlying density impacts the bias.
+
+$$Var[\hat{f}(x)] \approx \frac{f(x)R(k)^q}{n |\mathbf{h}|}$$
+
+* As sample size icnreases variance decreases.
+
+* As bandwidth increases smoother estimates and lower point variance
+
+Tradeoff between bias and variance
+
+$$AMSE[\hat{f}(x)] \approx Bias[\hat{f}(x)] + Var[\hat{f}(x)]$$
+
+## The curse of dimensionality
+
+Difficulty in detecting the structure of high-dimensional data generating process without excessive parametric assumptions
+
+* main drawback of nonparametric, but vesusus a mispecification in parametric analysis
+
+As dimensions increase it becomes harder to detect structure without prior assumptions
+
+Parametric models offer greater accuracy with less data at the expense of potential model specification.  Non-parametric assuage specification error at the expense of larger data requirements and slower convergence.
+
+## Bandwidth selection
+
+Bandwidth vector seelction should be a major concern in multivariate kernel density estimation and is a prime focus
+
+$$h_{opt} = \Bigg(\frac{qR(k)^q}{k_2^2(k)R(\nabla^2 f)} \Bigg)^{1/(4+q)} n^{-1/4+q}$$
+
+Multivariate setting with cross-validation bandwidth selection more than compensates for the scrifice of computer run-time to gandwidth estimates.
+
+### Bias and Variance AMSE:
+
+$$Bias[\hat{f}_{y|x}] \approx k_2 \sum_{d=0}^{q} h_{d}^2 B_d$$
+
+$$Var[\hat{f}_{y|x}(y|x)] \approx \frac{R(k)^{q+1}f_{y|x}(y|x)}{n| \mathbf{h}| f(_x(\mathbf{x}))} f_x(x)$$
+
+Can therefore derive the AMSE using these two terms
+
+### Bandwidth selection
+
+No proposed rule of thumb and would prefer data driven techniques.  For this reason LSCV is appropriate:
+
+$$\hat{ISE}_2 = \frac{1}{n} \sum_{i=1}^{n} \frac{\hat{f}_{-i,\mathbf{x},y}(\mathbf{x}_{i}, y_i)}{\hat{f}_{-i,\mathbf{x}(\mathbf{x}_i)}}$$
+
+$$LCSV(h_y,\mathbf{h}) = \hat{ISE}_1(h_y,\mathbf{h}) - 2 \hat{ISE}_2(h_y,\mathbf{h})$$
+
+### Inclusion of irrelevant variables
+
+Hall, Racine, and Li (2004) show LSCV has the ability to remove irrelevant variables:
+
+* Lessens curse of dimensionality
+
+* Fully automatic
+
+* Positive ability for results to carry over in conditional estimation
+
+Two methods for bandwidth selection:
+
+Rule-of-thumb
+
+$$h_d^{rot} = c(q) \hat{\sigma}_d n^{-1/(4+q)}$$
+
+Cross-validation bandwidth selection
+
+$$LCV(h)=n^{-1} \sum_{i=1}^{n} log(\hat{f}_{-i}(x_i))$$
+
+LCV can produce undersired consequence because of leave one out estimates:
+
+$$LSCV(h) = \frac{1}{n^2|\mathbf{h}|} \sum_{i=1}^{n} \sum_{j=1}^{n} \check{K}_h(\mathbf{x}_i, \mathbf{x}_j) $$
+
+LSCV is prefered method given limitation of LCV
+
+## Conditional density estimation
+
+From conditional density the first moment (mean or regression), quantiles, or second moment (heterogenous) can be investigated.
+
+$$\hat{f}_{y|\mathbf{x}} (y|\mathbf{x}) = \frac{\hat{f}_{\mathbf{x}|y}(\mathbf{x}|y)}{\hat{f}_{\mathbf{x}} (\mathbf{x})}$$
+
+Conditional density is a local average.
