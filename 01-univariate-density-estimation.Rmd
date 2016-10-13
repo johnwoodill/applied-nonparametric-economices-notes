@@ -1,8 +1,6 @@
 ---
 title: 'Chapter 2: Univariate density estimation'
 output: html_document
-  pdf_document:
-    fig_caption: yes
 ---
 
 # Univariate density estimation
@@ -155,6 +153,7 @@ histogram(x, 10)
 ```
 
 An expected density function where $\hat{f}(c) = \frac{n_j}{nh}$ can be plotted in R as:
+
 ```{r hist_dens_estimator}
 # Sample data
 set.seed(1234)
@@ -336,4 +335,134 @@ $$AMSE[\hat{f}(x)] = \text{Bias}[\hat{f}(x)]^2 + \text{Var}[\hat{f}(x)] $$
 $$AMSE[\hat{f}(x)] = \frac{k_2^2(k)}{4} f^{(2)}(x)^2h^4+(nh)^{-1} f(x)R(k)$$
 
 and shows the bias-variance trade off where the bias can be reduced at the expense of variance.  As $n \rightarrow \infty, h \rightarrow 0$, but bandwidth decreases slow enough so $nh \rightarrow \infty$.  If $h$ decreases too rapidly then gains in bias reduction are offset by increases in variance.  This is the fundamental relationship between bias and variance in nonparametric estimation.
+
+## Kernel selection
+
+Which kernel result has the lowest AMISE?  A calculus of variation can minimize the AMSE such that:
+
+$$min_k(\Psi) : AMISE[\hat{f}(x)] \text{s.t.} K_{0}(k) = 1; K_1 (K) = 0; K_2 (k) < \infty$$
+
+See Epanechnikov (1969), Serfling (1980) and Miller (1984)
+
+## Kernel efficiency
+
+If both density estimators contain optimal bandwidths, relative efficiency can be determined by comparing the ratio of AMISE for each.
+
+$$Eff (K_Q) = \frac{R(K_Q) K_2 (K_Q)^{1/2}}{R(K_1)}$$
+
+If $K_2(K) = 1$, then $Eff = \frac{R(K_Q)}{R(K1)}$
+
+Note: Epanechnikov kernel results in the loest AMISE it does not impy it is the best primaryly because
+
+* Epanechnikov contains only one derivative where may exceed multiple derivaties
+
+* Kernel optimallty \doesnotequal optimal AMISE kernel
+
+When selecting density estimator it is important to know the pentaly of different estimators and the need for additional obs to overcome this pentalty.
+
+**See table 2.2**
+
+## Bandwidth Selection
+
+Selection of bandwidth is anoter important mechanism for kernel estimation.
+
+#### Optimal selection
+
+The optimal bandwidth w.r.t minimuzing AMSE is :
+
+$$h_{opt} = [\frac{f(x)R(k)}{k_2^2(k) f^2 (x)^2}]^{1/5} n^{-1/5}$$
+
+Where $n^{-1/5}$ is the rate at which information is used by the bandwidth to decrease the bias.
+
+Appropriate scale factors are shown in table 2.3:
+
+### Data driven methods
+
+When the underlying density is not normal, it is desirable to have access to methods tailored to the underlying design.
+
+**Plug-in-method**
+
+The difficulty with obtaining optimal bandwidth selectors comes from unknown roughness of density $R(f^{(2)}$.  Repeated integration by parts of $\hat{R}(f^{(r)} = $
+
+$$\hat{R}(f^{(r)} = n^{-2} \check{h}^{(-1+r)} \sum_{i=1}^{n} \sum_{j=1}^{n} k^{2r} \frac{x_{i}-x_{j}}{\check{h}}$$
+
+The natural estimtor depends on choice of kernel and bandwidth with a few caveats.  First, the optimal bandwidth is: 
+
+$$\check{h}=[\frac{(-1)^{r/2}2k^{(2r)}(0)}{k_{2}(k)R(f^{(2r+2)})n}]^{1/(2r+2+1)}$$
+
+In order to estimate $R(\hat{(2)}$ we need to know the bandwidth for $R(\hat{f}^{4})$
+
+THe direct plug-in approach is an $l$-step algorithm for estimating $R(f^{2l+2})$ which is then "plugged in" for estimate $R(f^{2(l-1)+2)})$.  This is repeated until $R(f^{(2)})$ is obtained.  The Silverman approach uses a zero-step plug-in algorithm.
+
+**Least-sequares cross validation (LSCV)**
+
+The most popular approach is LSCV with a goal of minimizing the difference between the estimator density and the density itself.  The integrated equare error is defined as:
+
+$$\text{ISE}(\hat{f},f) = \int \hat{f}(x) - f(x)^{2}dx$$
+
+therefore, minimizing with respect to $h$
+
+$$\text{ISE}*(\hat{f},f)= \int \hat{f}(x)^{2}dx-2 - 2 \int \hat{f}(x) f(x)dx$$
+
+Because $f(x)$ is unknown a common approach is to leave one out so bandwidth selector does not exist for zero.  A simplification of estimating LSCV(h):
+
+$$LSCV(h) = \frac{1}{n^2 h} \sum_{i=1}^{n} \sum_{j=1}^{n} \check{k} (\frac{x_{i - x_j}}{h})$$
+
+This formulation condeses terms to allow an easier computation than leave-one-out
+
+Two ways for finding optimal $h$ is to:
+
+* Grid search, but bounds on grids may be a problem
+
+* Define rate ahead of time and optimize LSCV to evaluate the scale factor.  This may cause issues w/ over or undersmoothing the estimate
+
+**Likelihood Cross-validation**
+
+An easier estimation than LSCV is using likelihood-cross valudation (LCV).  The central idea is to select a bandwidth that maximizes LCV criterion to the true density (Kullback-Leisler Distance)
+
+$$KL(f, \hat{f}) = \int f(x) log{f(x)/\hat{f}(x)}dx$$
+LCV selects a bandwidth where additional observse the density estimator produces the highest likelihood.  Using leave-one-out, the average over data is estimated as:
+
+$$LCV(h) = n^{-1} \sum_{i=1}^{n} log\hat{f}_{i}(x_{i})$$
+One issue with LCV is it can produce inconsistent estimates as $h \rightarrow \infty$ due to distances between data points and sample sizes (e.g. fat tailed distributions widen, thus increasing inconsistency in data).  Kernel selection is important when using (LCV).
+
+## Plug-in or cross-validation?
+
+No clean consensus on the appropriate method for bandwidth selection.  One easy way of comparing bandwidth selections is to understand how uncertainty is manifested.  Understanding this uncertainty is key to bandwidth selection.
+
+If smoother estimates are desired, then AMISE may need be desireable because it focuses more son bias and variance.  Care in selecting smoothing estimates should be taken using plug-in method due to possibly oversmoothing.  It should be acknolwedged it is up to the researcher to understand and select the appropriate bandwidth selector.
+
+## Density Derivaties
+
+Interests in derivative may be of interest instead of the dentsity (e.g. methods requiring estimation of second derivative, Silverman)
+
+An estimateor of $r^{th}$ order derivative is:
+
+$$\hat{f}^{r}(x) = \frac{d^r}{dx^r} \hat{f}(x) = \frac{1}{n h^{r+1}} \sum_{i=1} k^{r} (\frac{x_{i}-x}{h})$$
+If sample size is small, and curves are not differentiable then estimates might be jumpy (e.g. EPD Neichnikov kernal is not differentiable).
+
+## Bias and Variance
+
+$$Bias[\hat{f}^{r}(x)] \approx \frac{h^2}{2} f^{r+2} (x) k_2(k)$$
+The bias is of the same order and identical up to scale with the bias of our initial density estimator, with the only difference being $f^{(2)}(x)$ derives bias of $\hat{f}(x)$.  The variance, however, is not so easily estimated.
+
+$$Var[\hat{f}^{(r)}](x) \approx \frac{f(x) R(k^{(r)}}{nh^{1+2r}}$$
+The magnitude of AMSE and AMISE is therefore larger.  Estimates of density with derivaties is not as precise.  The derivatives magnify as the derivative order is integrated.
+
+### Bandwidth selection
+
+
+A derivated equivalent under unknown density:
+
+$$AMSE \approx \frac{h^4}{4} f^{(r+2)}(x)^{r} k_2^2(k) + \frac{f(x)R(k^{(r)})}{nh^{1+2r}}$$
+
+However, the bandwidth convergence decays slower because of variance issues discussed above.  See page 49 for AMISE discussion adn optimal bandwidth selection which is omitted here.
+
+### Relative Efficiency
+
+Estimating between two kernels is down much the same way as without the derivative
+
+$$Eff(k_Q, r)= \frac{R(k_Q^{(r)})}{R(k_{r+1}^{(r)})} \Bigg(\frac{k_2^2(K_Q)}{k_2^2(K_r+1)})\Bigg)^{(1+2r)/4}$$
+
+Table 2.5 and 2.6 provide kernel efficiency for $r=1,2,3,4$ derivatives
 
