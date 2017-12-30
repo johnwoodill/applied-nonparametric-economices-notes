@@ -56,7 +56,7 @@ The figure above adjusts the bandwidth and shows the changes in the kernel densi
 
 Suppose $S(x)=[a,b]$ is a subset of the domain not mapped to zero (support) where the binwidth is defined as $h=(b-a)/J$ where $J$ are number of boxes in histogram.  The interval is defined as $(a-(j-1)h,a+jh]$ for $j=1,2,...,J$.  Therefore, the number of observations $n_j$ in bin $j$ is defined as:
 
-$$n_j=\sum_{i=1}^n 1 \{ \underbrace{a+(j-1)h < x_i \leq a+jh\}}_{\text{A}}$$
+$$n_j=\sum_{i=1}^n \mathbf{1} \{ \underbrace{a+(j-1)h < x_i \leq a+jh\}}_{\text{A}}$$
 
 
 where $1{A}$ is 1 if A is true and zero otherwise.  The Expected proportion of observations in jth interval can then be defined as:
@@ -223,19 +223,19 @@ plot(dat, type = "l", main = "Density of Histogram with 100 bins")
 
 With a crude estimator, bias varies considerable.  To overcome this, boxes at each point can be centered on each obs as:
 
-$$n_x=\sum_{i=1}^{n} 1 \{ x-h < x_i \leq x+h \}$$
+$$n_x=\sum_{i=1}^{n} \mathbf{1} \{ x-h < x_i \leq x+h \}$$
 
 therefore,
 
-$$\hat{f}(x) = \frac{n_x}{2nh} = \frac{1}{2nh} \sum_{i=1}^{n} 1 \{ x-h < x_i \leq x+h \}$$
+$$\hat{f}(x) = \frac{n_x}{2nh} = \frac{1}{2nh} \sum_{i=1}^{n} \mathbf{1} \{ x-h < x_i \leq x+h \}$$
 
 Conveniently, the density estimator can be defined as:
 
-$$\hat{f}(x) = \frac{1}{nh} \sum_{i=1}^{n} (1/2) 1 \{ | \frac{x_i - x}{h} | \leq 1 \}$$
+$$\hat{f}(x) = \frac{1}{nh} \sum_{i=1}^{n} (1/2) \mathbf{1} \{ | \frac{x_i - x}{h} | \leq 1 \}$$
 
 The derivative of expected cumulative density function (ECDF) is an equivalent density estimator:
 
-$$\hat{F}(x) = \frac{1}{n} \sum_{i=1}^{n} 1 \{ x_i \leq x \}$$
+$$\hat{F}(x) = \frac{1}{n} \sum_{i=1}^{n} \mathbf{1} \{ x_i \leq x \}$$
 
 where $f(x) = \frac{d}{dx}F(x)$
 
@@ -243,7 +243,7 @@ The numerical derivative is exactly the same as the naive estimator.
 
 Now, assume the kernel function, $k(\psi)$ is defined as:
 
-$$k(\psi)= (1/2) 1 \{| \frac{x_i - x}{h} | \leq 1 \} $$
+$$k(\psi)= (1/2) \mathbf{1} \{| \frac{x_i - x}{h} | \leq 1 \} $$
 
 where $k(\psi)$ is equal to one if $|\psi| \leq 1$
 
@@ -340,7 +340,7 @@ and shows the bias-variance trade off where the bias can be reduced at the expen
 
 Which kernel result has the lowest AMISE?  A calculus of variation can minimize the AMSE such that:
 
-$$min_k(\Psi) : AMISE[\hat{f}(x)] \text{s.t.} K_{0}(k) = 1; K_1 (K) = 0; K_2 (k) < \infty$$
+$$min_k(\Psi) : AMISE[\hat{f}(x)] \hspace{5mm} \text{s.t.} \hspace{2mm} K_{0}(k) = 1; K_1 (K) = 0; K_2 (k) < \infty$$
 
 See Epanechnikov (1969), Serfling (1980) and Miller (1984)
 
@@ -370,7 +370,7 @@ Selection of bandwidth is anoter important mechanism for kernel estimation.
 
 The optimal bandwidth w.r.t minimuzing AMSE is :
 
-$$h_{opt} = [\frac{f(x)R(k)}{k_2^2(k) f^2 (x)^2}]^{1/5} n^{-1/5}$$
+$$h_{opt} = \Bigg[\frac{f(x)R(k)}{k_2^2(k) f^2 (x)^2} \Bigg]^{1/5} n^{-1/5}$$
 
 Where $n^{-1/5}$ is the rate at which information is used by the bandwidth to decrease the bias.
 
@@ -382,13 +382,13 @@ When the underlying density is not normal, it is desirable to have access to met
 
 **Plug-in-method**
 
-The difficulty with obtaining optimal bandwidth selectors comes from unknown roughness of density $R(f^{(2)}$.  Repeated integration by parts of $\hat{R}(f^{(r)} = $
+The difficulty with obtaining optimal bandwidth selectors comes from unknown roughness of density $R(f^{(2)})$.  Repeated integration by parts of $\hat{R}(f^{(r)}) = $
 
-$$\hat{R}(f^{(r)} = n^{-2} \check{h}^{(-1+r)} \sum_{i=1}^{n} \sum_{j=1}^{n} k^{2r} \frac{x_{i}-x_{j}}{\check{h}}$$
+$$\hat{R}(f^{(r)}) = n^{-2} \check{h}^{(-1+r)} \sum_{i=1}^{n} \sum_{j=1}^{n} k^{2r} \frac{x_{i}-x_{j}}{\check{h}}$$
 
 The natural estimtor depends on choice of kernel and bandwidth with a few caveats.  First, the optimal bandwidth is: 
 
-$$\check{h}=[\frac{(-1)^{r/2}2k^{(2r)}(0)}{k_{2}(k)R(f^{(2r+2)})n}]^{1/(2r+2+1)}$$
+$$\check{h}= \Bigg[\frac{(-1)^{r/2}2k^{(2r)}(0)}{k_{2}(k)R(f^{(2r+2)})n} \Bigg]^{1/(2r+2+1)}$$
 
 In order to estimate $R(\hat{(2)}$ we need to know the bandwidth for $R(\hat{f}^{4})$
 
@@ -402,7 +402,7 @@ $$\text{ISE}(\hat{f},f) = \int \hat{f}(x) - f(x)^{2}dx$$
 
 therefore, minimizing with respect to $h$
 
-$$\text{ISE}*(\hat{f},f)= \int \hat{f}(x)^{2}dx-2 - 2 \int \hat{f}(x) f(x)dx$$
+$$\text{ISE}^*(\hat{f},f)= \int \hat{f}(x)^{2}dx-2 - 2 \int \hat{f}(x) f(x)dx$$
 
 Because $f(x)$ is unknown a common approach is to leave one out so bandwidth selector does not exist for zero.  A simplification of estimating LSCV(h):
 

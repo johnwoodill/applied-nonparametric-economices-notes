@@ -57,7 +57,7 @@ of Applied Econometrics, 19, 533-535.
 Microfinance Institutions Mobilize Microsavings? Evidence from Economies of Scope”
 Empirical Economics, 48, 193-225.
 
-**4. Regression**
+~~**4. Regression**~~
 
 * Henderson and Parmeter, Chapter 5
 
@@ -73,7 +73,7 @@ without Parameters,” Economic Journal, 122, 125-154.
 * Delgado, M. S., D. J. Henderson and C. F. Parmeter, 2014. “Does Education Matter
 for Economic Growth?” Oxford Bulletin of Economics and Statistics, 76, 334-359.
 
-**5. Semiparametric Regression**
+~~**5. Semiparametric Regression**~~
 
 * Henderson and Parmeter, Chapter 9
 

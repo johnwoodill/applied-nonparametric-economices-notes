@@ -77,7 +77,7 @@ $$\hat{m}(\mathbf{x}) = \frac{1}{n_x} \sum_{i \in S(x)}y_i$$
 
 Therefore, naive conditional mean estimator is:
 
-$$\hat{m}(\mathbf{x}) = \frac{\sum_{i=1}^{n} \mathbf{1} \{ |x_i - x| \leq h \ y_i}{\sum_{i=1}^n \mathbf{1} \{ |x_i - x| \leq h \}}$$
+$$\hat{m}(\mathbf{x}) = \frac{\sum_{i=1}^{n} \mathbf{1} \{ |x_i - x| \leq h \} y_i}{\sum_{i=1}^n \mathbf{1} \{ |x_i - x| \leq h \}}$$
 
 This is a uniform kernel, the same as in 5.2.1 equation where $A_i (x) = 1{|x_i - x| \leq h}/n_x$
 
@@ -97,7 +97,7 @@ therefore identical to the base equation in 5.2.1 where new estimator is
 
 $$a = \hat{m}(\mathbf{x}) = \frac{\sum_{i=1}^{n} K_h (x_i, x) y_i}{\sum_{i=1}^{n}K_h (x_i,x)}$$
 
-where $t$ is an $nx1$ vector of one
+where $t$ is an $n \text{x}1$ vector of one
 
 Figure 5.4
 
@@ -129,7 +129,7 @@ Another important note isthe vairance of the density estimator is directly relat
 
 Therefore, 
 
-$$AMSE = Bias[(\hat{m}(\mathbf{x})] + var[\hat{m}(\mathbf{x})]$$
+$$AMSE = Bias[(\hat{m}(\mathbf{x})] + Var[\hat{m}(\mathbf{x})]$$
 
 Notice a standard bias trade-off with bandwidth parameter.  Consistency is achieved with icnreasing sample size, bandwidth shrinks, but slower than sample size.
 
